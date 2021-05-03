@@ -139,6 +139,16 @@ done;
 
 clear
 
+cd ${main_folder}
 
+files=`ls`
+
+# Create List of Not Empty Files
+for f in ${files//' '/'?'}; do
+
+    [[ -f ${f} && -s ${f} ]] && \
+        text_files[${#text_files[@]}]=${f}
+
+done
 
 exit 0;
