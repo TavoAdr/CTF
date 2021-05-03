@@ -107,3 +107,13 @@ function pause(){
 
 }
 
+# Variables
+
+# - - Text Style
+txt_none="\033[m"           # Normal Text
+txt_red="\033[1;31m"        # Cancel/Back
+txt_green="\033[1;32m"      # Normal Options
+txt_yellow="\033[1;33m"     # Lists
+txt_blue="\033[1;36m"       # Keys
+txt_bold="\033[1;37m"       # Notes to user
+
