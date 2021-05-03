@@ -117,3 +117,28 @@ txt_yellow="\033[1;33m"     # Lists
 txt_blue="\033[1;36m"       # Keys
 txt_bold="\033[1;37m"       # Notes to user
 
+# Script
+
+clear
+
+main_folder=${*}
+
+# Empty folder
+[[ -z ${main_folder} ]] && \
+    read -p "    In which folder do you want to run the program? " main_folder
+
+# Invalid folder
+while [[ ! -d ${main_folder} ]]; do
+
+    clear
+
+    echo -en "    Invalid folder (${txt_yellow}${main_folder}${txt_none}), in which folder do you want to run the program? "
+    read main_folder
+
+done;
+
+clear
+
+
+
+exit 0;
