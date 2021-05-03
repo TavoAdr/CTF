@@ -34,8 +34,6 @@ function showMenu(){
 
 function pause(){
 
-    echo ''
-
     local _in
 
     while [[ -n ${1} ]]; do
@@ -75,7 +73,7 @@ function pause(){
     
         if [[ ${_beg_txt} = 0 ]]; then
             
-            clear && echo ''
+            clear
             _beg_txt="Empty folder"
 
         elif [[ ${_beg_txt} = -1 ]]; then
@@ -88,7 +86,7 @@ function pause(){
             _end_txt="continue"
         elif [[ ${_end_txt} = -1 ]]; then
     
-            clear && echo ''
+            clear
             _end_txt="try again"
     
         fi
@@ -123,31 +121,64 @@ clear
 
 main_folder=${*}
 
-# Empty folder
-[[ -z ${main_folder} ]] && \
-    read -p "    In which folder do you want to run the program? " main_folder
+while :; do
 
-# Invalid folder
-while [[ ! -d ${main_folder} ]]; do
+    # Empty folder
+    [[ -z ${main_folder} ]] && \
+        read -p "    In which folder do you want to run the program? " main_folder
+
+    # Invalid folder
+    while [[ ! -d ${main_folder} ]]; do
+
+        clear
+
+        echo -en "    Invalid folder (${txt_yellow}${main_folder}${txt_none}), in which folder do you want to run the program? "
+        read main_folder
+
+    done;
 
     clear
 
-    echo -en "    Invalid folder (${txt_yellow}${main_folder}${txt_none}), in which folder do you want to run the program? "
-    read main_folder
+    cd ${main_folder}
 
-done;
+    files=`ls`
 
-clear
+    # Create List of Not Empty Files
+    for f in ${files//' '/'?'}; do
 
-cd ${main_folder}
+        [[ -f ${f} && -s ${f} ]] && \
+            text_files[${#text_files[@]}]=${f}
 
-files=`ls`
+    done
 
-# Create List of Not Empty Files
-for f in ${files//' '/'?'}; do
+    while :; do
 
-    [[ -f ${f} && -s ${f} ]] && \
-        text_files[${#text_files[@]}]=${f}
+        if [[ ${#text_files[@]} -eq 0 ]]; then
+
+            read -n1 -p "    Empty folder or file(s), you want retype the folder name?(Y/N) " option
+
+            case "${option,,}" in
+                
+                y|1)
+                    unset main_folder
+                    clear
+                    break
+                ;;
+
+                n|0) exit 0 ;;
+                
+                *)
+                    pause -beg -1 -end -1
+                    clear
+                ;;
+            
+            esac
+
+        else
+            break 2
+        fi
+
+    done
 
 done
 
