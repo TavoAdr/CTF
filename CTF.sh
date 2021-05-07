@@ -144,9 +144,9 @@ while :; do
     files=`ls`
 
     # Create List of Not Empty Files
-    for f in ${files//' '/'?'}; do
+    for f in ${files}; do
 
-        [[ -f ${f} && -s ${f} ]] && \
+        [[ -f ${f} && -s ${f} && `file -bi ${f//' '/'?'} | grep -c text` -eq 1 ]] && \
             text_files[${#text_files[@]}]=${f}
 
     done
