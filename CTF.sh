@@ -187,9 +187,24 @@ done
 # edit list (add, remove, continue, exit)
 
 # Choose whether or not to enumerate the lines in the file
+while [[ ${option,,} != y && ${option,,} != n ]]; do
+    
+    clear
+    
+    read -n1 -p '    Do you want to display the lines of the numbered files?(Y/N) ' option
+    
+    if [[ ${option,,} == y ]]; then
+        enumerate=-n
+    elif [[ ${option,,} != n ]]; then
+        pause -beg -1 -end -1
+    fi
+
+done
+
+clear
 
 # Choose the File Name
-read -p "What is the file name? " file_name
+read -p "    What is the file name? " file_name
 
 # Create text file
 touch ${file_name}
