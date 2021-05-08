@@ -123,11 +123,11 @@ main_folder=${*}
 
 while :; do
 
-    # Empty folder
+    # Empty Folder
     [[ -z ${main_folder} ]] && \
         read -p "    In which folder do you want to run the program? " main_folder
 
-    # Invalid folder
+    # Invalid Folder
     while [[ ! -d ${main_folder} ]]; do
 
         clear
@@ -141,9 +141,11 @@ while :; do
 
     cd ${main_folder}
 
-    files=`ls`
+    # Choose whether or not to filter files
 
-    # Create List of Not Empty Files
+    files=`ls ${filter}`
+
+    # Create List of Not Empty Text Files
     for f in ${files}; do
 
         [[ -f ${f} && -s ${f} && `file -bi ${f//' '/'?'} | grep -c text` -eq 1 ]] && \
@@ -182,4 +184,27 @@ while :; do
 
 done
 
-exit 0;
+# edit list (add, remove, continue, exit)
+
+# Choose whether or not to enumerate the lines in the file
+
+# Create text file
+touch tempCTFfile
+
+i=1
+for f in ${text_files[@]}; do
+
+    echo -e "Arquivo ${i}: ${f}\n" >> tempCTFfile
+
+    cat ${enumerate} ${f} >> tempCTFfile
+    
+    echo -e "\n\n\n" >> tempCTFfile
+    
+    let i++
+
+done
+unset i
+
+# txt2pdf
+
+exit 0
