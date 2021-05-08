@@ -188,17 +188,21 @@ done
 
 # Choose whether or not to enumerate the lines in the file
 
+# Choose the File Name
+read -p "What is the file name? " file_name
+
 # Create text file
-touch tempCTFfile
+touch ${file_name}
 
 i=1
 for f in ${text_files[@]}; do
 
-    echo -e "Arquivo ${i}: ${f}\n" >> tempCTFfile
-
-    cat ${enumerate} ${f} >> tempCTFfile
+    echo -e "ARQUIVO ${i}: ${f}\n" >> ${file_name} 2> /dev/null
     
-    echo -e "\n\n\n" >> tempCTFfile
+
+    cat ${enumerate} ${f} >> ${file_name} 2> /dev/null
+    
+    echo -e "\n\n\n" >> ${file_name} 2> /dev/null
     
     let i++
 
@@ -206,5 +210,10 @@ done
 unset i
 
 # txt2pdf
+cat ${file_name} | iconv -c -f utf-8 -t ISO-8859-1 | enscript -q --margins=20:-100:20:20 -f Arial12 -Bo ${file_name}
+ps2pdf ${file_name}
+
+# Remove Temp File
+rm ${file_name}
 
 exit 0
