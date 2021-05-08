@@ -142,6 +142,33 @@ while :; do
     cd ${main_folder}
 
     # Choose whether or not to filter files
+    while [[ ${option,,} != y && ${option,,} != n ]]; do
+        
+        clear
+        
+        read -n1 -p '    Do you want to filter the files to be concatenated?(Y/N) ' option
+        
+        if [[ ${option,,} == y ]]; then
+
+            clear
+            
+            read -p "    Type the pattern at the beginning of the file or enter? " beg
+            
+            clear
+            
+            read -p "    Type the pattern at the end of the file or enter? " end
+
+            filter=${beg}*${end}
+
+        elif [[ ${option,,} != n ]]; then
+            pause -beg -1 -end -1
+        fi
+
+    done
+
+    unset option
+
+    clear
 
     files=`ls ${filter}`
 
@@ -201,23 +228,36 @@ while [[ ${option,,} != y && ${option,,} != n ]]; do
 
 done
 
+unset option
+
 clear
 
 # Choose the File Name
-read -p "    What is the file name? " file_name
+while [[ -z ${file_name} ]]; do
+    
+    read -p "    What is the file name? " file_name
+
+    if [[ -z ${file_name} ]]; then
+
+        pause -beg -1 -end -1
+        clear
+    
+    fi
+
+done
 
 # Create text file
-touch ${file_name}
+touch ${file_name}.txt
 
 i=1
 for f in ${text_files[@]}; do
 
-    echo -e "ARQUIVO ${i}: ${f}\n" >> ${file_name} 2> /dev/null
+    echo -e "ARQUIVO ${i}: ${f}\n" >> ${file_name}.txt 2> /dev/null
     
 
-    cat ${enumerate} ${f} >> ${file_name} 2> /dev/null
+    cat ${enumerate} ${f} >> ${file_name}.txt 2> /dev/null
     
-    echo -e "\n\n\n" >> ${file_name} 2> /dev/null
+    echo -e "\n\n\n" >> ${file_name}.txt 2> /dev/null
     
     let i++
 
@@ -225,10 +265,10 @@ done
 unset i
 
 # txt2pdf
-cat ${file_name} | iconv -c -f utf-8 -t ISO-8859-1 | enscript -q --margins=20:-100:20:20 -f Arial12 -Bo ${file_name}
-ps2pdf ${file_name}
+cat ${file_name}.txt | iconv -c -f utf-8 -t ISO-8859-1 | enscript -q --margins=20:-100:20:20 -f Arial12 -Bo ${file_name}.ps
+ps2pdf ${file_name}.ps ${file_name}.pdf
 
 # Remove Temp File
-rm ${file_name}
+rm ${file_name}.txt ${file_name}.ps
 
 exit 0
