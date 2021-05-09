@@ -121,35 +121,35 @@ clear
 
 main_folder=${*}
 
-while :; do
+# Empty Folder
+[[ -z ${main_folder} ]] && \
+    read -p "    In which folder do you want to run the program? " main_folder
 
-    # Empty Folder
-    [[ -z ${main_folder} ]] && \
-        read -p "    In which folder do you want to run the program? " main_folder
-
-    # Invalid Folder
-    while [[ ! -d ${main_folder} ]]; do
-
-        clear
-
-        echo -en "    Invalid folder (${txt_yellow}${main_folder}${txt_none}), in which folder do you want to run the program? "
-        read main_folder
-
-    done;
+# Invalid Folder
+while [[ ! -d ${main_folder} ]]; do
 
     clear
 
-    cd ${main_folder}
+    echo -en "    Invalid folder (${txt_yellow}${main_folder}${txt_none}), in which folder do you want to run the program? "
+    read main_folder
 
-    # Choose whether or not to filter files
-    while [[ ${option,,} != y && ${option,,} != n ]]; do
-        
-        clear
-        
-        read -n1 -p '    Do you want to filter the files to be concatenated?(Y/N) ' option
-        
-        if [[ ${option,,} == y ]]; then
+done;
 
+clear
+
+cd ${main_folder}
+
+# Choose whether or not to filter files
+while :; do
+    
+    clear
+    
+    read -n1 -p '    Do you want to filter the files to be concatenated?(Y/N) ' option
+
+    case "${option,,}" in
+            
+        y|1)
+                
             clear
             
             read -p "    Type the pattern at the beginning of the file or enter? " beg
@@ -158,56 +158,36 @@ while :; do
             
             read -p "    Type the pattern at the end of the file or enter? " end
 
-            filter=${beg}*${end}
+            filter=${beg}*${end} 
 
-        elif [[ ${option,,} != n ]]; then
+        ;;
+
+        n|0) ;;
+        
+        *)
+        
             pause -beg -1 -end -1
-        fi
-
-    done
-
-    unset option
-
-    clear
-
-    files=`ls ${filter}`
-
-    # Create List of Not Empty Text Files
-    for f in ${files}; do
-
-        [[ -s ${f} && `file -bi ${f//' '/'?'} | grep -c text` -eq 1 ]] && \
-            text_files[${#text_files[@]}]=${f}
-
-    done
-
-    while :; do
-
-        if [[ ${#text_files[@]} -eq 0 ]]; then
-
-            read -n1 -p "    Empty folder or file(s), you want retype the folder name?(Y/N) " option
-
-            case "${option,,}" in
-                
-                y|1)
-                    unset main_folder
-                    clear
-                    break
-                ;;
-
-                n|0) exit 0 ;;
-                
-                *)
-                    pause -beg -1 -end -1
-                    clear
-                ;;
+            continue
             
-            esac
+        ;;
+    
+    esac
 
-        else
-            break 2
-        fi
+    break
 
-    done
+done
+
+unset option
+
+clear
+
+files=`ls ${filter}`
+
+# Create List of Not Empty Text Files
+for f in ${files}; do
+
+    [[ -s ${f} && `file -bi ${f//' '/'?'} | grep -c text` -eq 1 ]] && \
+        text_files[${#text_files[@]}]=${f}
 
 done
 
@@ -301,17 +281,29 @@ done
 unset option removed
 
 # Choose whether or not to enumerate the lines in the file
-while [[ ${option,,} != y && ${option,,} != n ]]; do
+while :; do
     
     clear
     
     read -n1 -p '    Do you want to display the lines of the numbered files?(Y/N) ' option
+
+    case "${option,,}" in
+                
+        y|1) enumerate=-n ;;
+
+        n|0) ;;
+        
+        *)
+            
+            pause -beg -1 -end -1
+            continue
+
+        ;;
+
     
-    if [[ ${option,,} == y ]]; then
-        enumerate=-n
-    elif [[ ${option,,} != n ]]; then
-        pause -beg -1 -end -1
-    fi
+    esac
+    
+    break
 
 done
 
