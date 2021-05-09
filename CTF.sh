@@ -115,11 +115,91 @@ txt_yellow="\033[1;33m"     # Lists
 txt_blue="\033[1;36m"       # Keys
 txt_bold="\033[1;37m"       # Notes to user
 
+help_text="\n\t  CTF.sh [-d DIR] [-ft PATTERN] [-fn FILE_NAME]\n\n------------------------------------------------------------------\n\n    Description:\n\n\tBasic Command for creating a pdf file using text files.\n\n------------------------------------------------------------------\n\n    Options:\n\n\b\t-d DIRECTORY\tDefines the folders where the files are.\n\n\t-ft FILTER\tCreate filter for files that will be used\n\t\t\tby the program.\n\n\t-fn NAME_FILE\tDefines the name of the file.\n\n\t-silent\t\tDon't show the options for editing the\n\t\t\tlist.\n\n\t-enumerate\tShow enumerates lines of files.\n\n------------------------------------------------------------------\n\n    NOTE:\n\n\tOptions that depend on the passage of a text to the\n\tside, as is the case with -d, -fn, and among many\n\tothers must always be alone or at the end of a set\n\tof arguments, having at most one argument of this\n\ttype at a time.\n\n------------------------------------------------------------------\n\n\t\t\t /-----------------\ \n\t\t\t<| Type Q to quit. |>\n\t\t\t \-----------------/ \n"
+
+# Set Main Variables
+
+# help
+[[ `echo ${*} | grep -ci 'help'` == 1 ]] && \
+    echo -e "${help_text}" | less && \
+    exit 0
+
+# silent
+[[ `echo ${*} | grep -ci 'enumerate'` == 1 ]] && \
+    enumerate=-n
+
+# enumerate
+[[ `echo ${*} | grep -ci 'silent'` == 1 ]] && \
+    silent=1
+
+while [[ -n $1 ]]; do
+
+    _in=${1}
+
+    # dir
+    if [[ ${1,,} == -*d* ]]; then
+        
+        if [[ -z ${main_folder} ]]; then
+        
+            shift
+            main_folder="${1}"
+            shift
+        
+        else
+
+            echo -e "\n   You cannot use more than one parent folder.\n"
+            exit 0
+        
+        fi
+
+    fi
+
+    # filter
+    if [[ ${1,,} == -*ft* ]]; then
+
+        if [[ -z ${filter} ]]; then
+        
+            shift
+            filter="${1}"
+            shift
+
+        else
+
+            echo -e "\n   You cannot use more than one filter.\n"
+            exit 0
+        
+        fi
+
+    fi
+
+    # file_name
+    if [[ ${1,,} == -*fn* ]]; then
+        
+        if [[ -z ${file_name} ]]; then
+        
+            shift
+            file_name="${1}"
+            shift
+
+        else
+
+            echo -e "\n   You cannot use more than one file name.\n"
+            exit 0
+        
+        fi
+
+    fi
+
+    [[ ${_in} == ${1} ]] && \
+        shift
+
+done
+
+unset _in
+
 # Script
 
 clear
-
-main_folder=${*}
 
 # Empty Folder
 [[ -z ${main_folder} ]] && \
@@ -140,7 +220,7 @@ clear
 cd ${main_folder}
 
 # Choose whether or not to filter files
-while :; do
+while [[ -z ${filter} ]]; do
     
     clear
     
@@ -162,18 +242,11 @@ while :; do
 
         ;;
 
-        n|0) ;;
+        n|0) break ;;
         
-        *)
-        
-            pause -beg -1 -end -1
-            continue
-            
-        ;;
+        *) pause -beg -1 -end -1 ;;
     
     esac
-
-    break
 
 done
 
@@ -192,7 +265,7 @@ for f in ${files}; do
 done
 
 # edit list (add, remove, continue, exit)
-while [[ ${option} -ne 3 ]]; do
+while [[ ${option} -ne 3 && -z ${silent} ]]; do
 
     showMenu "You will create a pdf with the files:\n\n\t${txt_yellow}${text_files[@]}${txt_none}\n\n    What do you want to do?:-:0Add a new element to the list.:-:1Removes an element from the list.:-:2Continue.:-:3Exit.04"
 
@@ -278,10 +351,10 @@ while [[ ${option} -ne 3 ]]; do
     
 done
 
-unset option removed
+unset option
 
 # Choose whether or not to enumerate the lines in the file
-while :; do
+while [[ -z ${enumerate} ]]; do
     
     clear
     
@@ -291,19 +364,12 @@ while :; do
                 
         y|1) enumerate=-n ;;
 
-        n|0) ;;
+        n|0) break ;;
         
-        *)
-            
-            pause -beg -1 -end -1
-            continue
-
-        ;;
+        *) pause -beg -1 -end -1 ;;
 
     
     esac
-    
-    break
 
 done
 
