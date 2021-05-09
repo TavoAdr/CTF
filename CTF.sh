@@ -175,7 +175,7 @@ while :; do
     # Create List of Not Empty Text Files
     for f in ${files}; do
 
-        [[ -f ${f} && -s ${f} && `file -bi ${f//' '/'?'} | grep -c text` -eq 1 ]] && \
+        [[ -s ${f} && `file -bi ${f//' '/'?'} | grep -c text` -eq 1 ]] && \
             text_files[${#text_files[@]}]=${f}
 
     done
@@ -212,6 +212,93 @@ while :; do
 done
 
 # edit list (add, remove, continue, exit)
+while [[ ${option} -ne 3 ]]; do
+
+    showMenu "You will create a pdf with the files:\n\n\t${txt_yellow}${text_files[@]}${txt_none}\n\n    What do you want to do?:-:0Add a new element to the list.:-:1Removes an element from the list.:-:2Continue.:-:3Exit.04"
+
+    case "${option}" in
+
+        # Exit
+        0) exit 0 ;;
+
+        # Add
+        1)
+
+            clear
+
+            read -p "    Enter the name of the new element: " files
+
+            clear
+
+            [[ -s ${files} && `file -bi ${files//' '/'?'} | grep -c text` -eq 1 ]] && \
+                text_files[${#text_files[@]}]=${files} || \
+                pause -beg "This item is not a text file or is empty" -end 1
+        
+        ;;
+        
+        # Remove
+        2)
+            
+            clear
+
+            if [[ -z ${text_files[*]} ]]; then
+                pause -beg "You can't remove files of the list because the text files list is empty" -end 1 -t10
+
+            else
+
+                until
+                
+                    echo -e "\n    The text files list is:\n"
+                    
+                    cont=0
+
+                    for a in "${text_files[@]}"; do
+                        
+                        let cont++
+
+                        echo -e "\t${txt_green}${cont})${txt_none} ${a}"
+
+                    done
+                    
+                    unset cont
+                    
+                    echo ''
+
+                    read -p "    Enter the number of the file to be removed from the list: " position
+                    
+                    [[ ${position} -le 0 || ${position} -gt ${#text_files[*]} ]] && \
+                        pause -beg -1 -end -1 && \
+                        clear
+                
+                [[ ${position} -ge 1 && ${position} -le ${#text_files[*]} ]]
+                do true ; done
+
+                unset text_files[$(( ${position} - 1 ))]
+                read -ra text_files -d '' <<< `echo "${text_files[@]}"`
+
+            fi
+
+        ;;
+        
+        # Continue
+        3)
+    
+            clear
+
+            [[ -z ${text_files[*]} ]] && \
+                pause -beg "You can't continue because there are no itens in the list" -end -1 -t10 && \
+                option=5
+            
+        ;;
+        
+        # Default
+        *) pause -beg -1 -end -1 ;;
+    
+    esac
+    
+done
+
+unset option removed
 
 # Choose whether or not to enumerate the lines in the file
 while [[ ${option,,} != y && ${option,,} != n ]]; do
@@ -246,7 +333,7 @@ while [[ -z ${file_name} ]]; do
 
 done
 
-# Create text file
+# Create and edit text file
 touch ${file_name}.txt
 
 i=1
@@ -265,7 +352,7 @@ done
 unset i
 
 # txt2pdf
-cat ${file_name}.txt | iconv -c -f utf-8 -t ISO-8859-1 | enscript -q --margins=20:-100:20:20 -f Arial12 -Bo ${file_name}.ps
+cat ${file_name}.txt | iconv -c -f utf-8 -t ISO-8859-1 | enscript -q --margins=20:-125:20:20 -f Arial12 -Bo ${file_name}.ps
 ps2pdf ${file_name}.ps ${file_name}.pdf
 
 # Remove Temp File
