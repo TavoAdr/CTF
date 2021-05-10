@@ -422,14 +422,14 @@ while [[ -z ${output_folder} ]]; do
             
             # Empty Folder
             [[ -z ${output_folder} ]] && \
-                read -p "    In which folder do you want to run the program? " output_folder
+                read -p "    In which folder do you want to create the pdf file? " output_folder
 
             # Invalid Folder
             while [[ ! -d ${output_folder} ]]; do
 
                 clear
 
-                echo -en "    Invalid folder (${txt_yellow}${output_folder}${txt_none}), in which folder do you want to run the program? "
+                echo -en "    Invalid folder (${txt_yellow}${output_folder}${txt_none}), in which folder do you want to create the pdf file? "
                 read output_folder
 
             done;
@@ -470,6 +470,6 @@ ps2pdf ${file_name}.ps ${file_name}.pdf
 rm ${file_name}.txt ${file_name}.ps
 
 [[ -n ${output_folder} ]] && \
-    mv ${file_name}.pdf ${output_folder}
+    mv ${file_name}.pdf ${output_folder// /?} 2> /dev/null
 
 exit 0
