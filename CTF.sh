@@ -46,7 +46,6 @@ function pause(){
             local _beg_txt=${1}
             shift
             
-
         fi
 
         if [[ ${1,,} == -*end* ]]; then
@@ -136,13 +135,29 @@ while [[ -n $1 ]]; do
 
     _in=${1}
 
-    # dir
-    if [[ ${1,,} == -*d* ]]; then
+    # output dir
+    if [[ ${1,,} == -*od* ]]; then
         
-        if [[ -z ${main_folder} ]]; then
+        if [[ -z ${output_folder} ]]; then
         
             shift
-            main_folder="${1}"
+            output_folder="${1}"
+            shift
+        
+        else
+
+            echo -e "\n   You cannot use more than one parent folder.\n"
+            exit 0
+        
+        fi
+
+    # input dir
+    elif [[ ${1,,} == -*d* ]]; then
+        
+        if [[ -z ${input_folder} ]]; then
+        
+            shift
+            input_folder="${1}"
             shift
         
         else
@@ -202,22 +217,22 @@ unset _in
 clear
 
 # Empty Folder
-[[ -z ${main_folder} ]] && \
-    read -p "    In which folder do you want to run the program? " main_folder
+[[ -z ${input_folder} ]] && \
+    read -p "    In which folder do you want to run the program? " input_folder
 
 # Invalid Folder
-while [[ ! -d ${main_folder} ]]; do
+while [[ ! -d ${input_folder} ]]; do
 
     clear
 
-    echo -en "    Invalid folder (${txt_yellow}${main_folder}${txt_none}), in which folder do you want to run the program? "
-    read main_folder
+    echo -en "    Invalid folder (${txt_yellow}${input_folder}${txt_none}), in which folder do you want to run the program? "
+    read input_folder
 
 done;
 
 clear
 
-cd ${main_folder}
+cd ${input_folder}
 
 # Choose whether or not to filter files
 while [[ -z ${filter} ]]; do
@@ -391,6 +406,44 @@ while [[ -z ${file_name} ]]; do
 
 done
 
+# Define output folder
+
+while [[ -z ${output_folder} ]]; do
+
+    clear
+
+    read -n1 -p '    Do you want to define where the pdf file should be created?(Y/N) ' option
+
+    case "${option,,}" in
+                
+        y|1)
+                
+            clear
+            
+            # Empty Folder
+            [[ -z ${output_folder} ]] && \
+                read -p "    In which folder do you want to run the program? " output_folder
+
+            # Invalid Folder
+            while [[ ! -d ${output_folder} ]]; do
+
+                clear
+
+                echo -en "    Invalid folder (${txt_yellow}${output_folder}${txt_none}), in which folder do you want to run the program? "
+                read output_folder
+
+            done;
+
+        ;;
+
+        n|0) break ;;
+        
+        *) pause -beg -1 -end -1 ;;
+    
+    esac
+
+done
+
 # Create and edit text file
 touch ${file_name}.txt
 
@@ -415,5 +468,8 @@ ps2pdf ${file_name}.ps ${file_name}.pdf
 
 # Remove Temp File
 rm ${file_name}.txt ${file_name}.ps
+
+[[ -n ${output_folder} ]] && \
+    mv ${file_name}.pdf ${output_folder}
 
 exit 0
