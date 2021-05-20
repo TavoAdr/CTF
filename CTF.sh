@@ -463,11 +463,10 @@ done
 unset i
 
 # txt2pdf
-cat ${file_name}.txt | iconv -c -f utf-8 -t ISO-8859-1 | enscript -q --margins=20:-125:20:20 -f Arial12 -Bo ${file_name}.ps
-ps2pdf ${file_name}.ps ${file_name}.pdf
+libreoffice --convert-to pdf ${file_name}.txt &> /dev/null
 
 # Remove Temp File
-rm ${file_name}.txt ${file_name}.ps
+rm ${file_name}.txt
 
 [[ -n ${output_folder} ]] && \
     mv ${file_name}.pdf ${output_folder// /?} 2> /dev/null
