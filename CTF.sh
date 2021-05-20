@@ -123,11 +123,11 @@ help_text="\n\t  CTF.sh [-d DIR] [-ft PATTERN] [-fn FILE_NAME]\n\n--------------
     echo -e "${help_text}" | less && \
     exit 0
 
-# silent
+# enumerate
 [[ `echo ${*} | grep -ci 'enumerate'` == 1 ]] && \
     enumerate=-n
 
-# enumerate
+# silent
 [[ `echo ${*} | grep -ci 'silent'` == 1 ]] && \
     silent=1
 
@@ -235,7 +235,7 @@ clear
 cd ${input_folder}
 
 # Choose whether or not to filter files
-while [[ -z ${filter} ]]; do
+while [[ -z ${filter} && -z ${silent} ]]; do
     
     clear
     
@@ -369,7 +369,7 @@ done
 unset option
 
 # Choose whether or not to enumerate the lines in the file
-while [[ -z ${enumerate} ]]; do
+while [[ -z ${enumerate} && -z ${silent} ]]; do
     
     clear
     
@@ -408,7 +408,7 @@ done
 
 # Define output folder
 
-while [[ -z ${output_folder} ]]; do
+while [[ -z ${output_folder} && -z ${silent} ]]; do
 
     clear
 
